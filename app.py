@@ -1,24 +1,25 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import openai
 import os
+from openai import OpenAI
 
 app = Flask(__name__)
-CORS(app)  # 🔥 CORS 설정 추가
+CORS(app)
 
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+# 최신 방식의 OpenAI 클라이언트
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 @app.route("/api", methods=["POST"])
 def chat():
     data = request.get_json()
     message = data.get("message", "")
 
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model="gpt-4",
         messages=[{"role": "user", "content": message}]
     )
 
-    return jsonify({"reply": response.choices[0].message["content"].strip()})
+    return jsonify({"reply": response.choices[0].message.content.strip()})
 
 @app.route("/")
 def home():
