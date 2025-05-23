@@ -21,3 +21,8 @@ def chat():
 @app.route("/")
 def home():
     return "AI 백엔드 작동 중!"
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))  # Render가 지정한 포트 사용
+    app.run(host="0.0.0.0", port=port)        # 외부 접근 허용 + 포트 바인딩
+
