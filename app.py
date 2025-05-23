@@ -15,8 +15,9 @@ def chat():
     message = data.get("message", "")
 
     response = client.chat.completions.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": message}]
+    model="gpt-3.5-turbo",  # ✅ 여기!
+    messages=[{"role": "user", "content": message}]
+)
     )
 
     return jsonify({"reply": response.choices[0].message.content.strip()})
