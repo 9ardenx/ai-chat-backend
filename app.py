@@ -26,6 +26,12 @@ def chat():
 
         res = requests.post(url, headers=headers, json=body)
         res_json = res.json()
+
+        # ✅ 에러 응답 처리
+        if "error" in res_json:
+            return jsonify({"reply": f"Gemini API 오류: {res_json['error']['message']}"})
+
+        # ✅ 정상 응답 처리
         reply = res_json["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         reply = f"에러 발생: {str(e)}"
@@ -39,3 +45,4 @@ def home():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
