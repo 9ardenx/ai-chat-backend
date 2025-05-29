@@ -1,14 +1,12 @@
+import os
+import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
-import google.generativeai as genai
 
 app = Flask(__name__)
 CORS(app)
 
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-
-model = genai.GenerativeModel(model_name="models/gemini-pro")
+API_KEY = os.environ.get("GEMINI_API_KEY")
 
 @app.route("/api", methods=["POST"])
 def chat():
@@ -16,8 +14,19 @@ def chat():
     message = data.get("message", "")
 
     try:
-        response = model.generate_content(message)
-        reply = response.text.strip()
+        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={API_KEY}"
+        headers = {"Content-Type": "application/json"}
+        body = {
+            "contents": [
+                {
+                    "parts": [{"text": message}]
+                }
+            ]
+        }
+
+        res = requests.post(url, headers=headers, json=body)
+        res_json = res.json()
+        reply = res_json["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         reply = f"에러 발생: {str(e)}"
 
@@ -25,9 +34,8 @@ def chat():
 
 @app.route("/")
 def home():
-    return "Gemini 백엔드 작동 중!"
+    return "Gemini API 직접 호출 중!"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
