@@ -6,12 +6,9 @@ import google.generativeai as genai
 app = Flask(__name__)
 CORS(app)
 
-# 환경변수에서 키 불러오기
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
-# Gemini 설정
-genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("models/text-bison-001")
+model = genai.GenerativeModel(model_name="models/gemini-pro")
 
 @app.route("/api", methods=["POST"])
 def chat():
@@ -33,5 +30,4 @@ def home():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
 
