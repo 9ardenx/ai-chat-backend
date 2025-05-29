@@ -11,7 +11,7 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 # Gemini 설정
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("models/text-bison-001")
 
 @app.route("/api", methods=["POST"])
 def chat():
