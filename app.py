@@ -1,29 +1,34 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-from openai import OpenAI
+import google.generativeai as genai
 
 app = Flask(__name__)
 CORS(app)
 
-# 최신 방식의 OpenAI 클라이언트
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+# 환경변수에서 키 불러오기
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+
+# Gemini 설정
+genai.configure(api_key=GEMINI_API_KEY)
+model = genai.GenerativeModel("gemini-pro")
 
 @app.route("/api", methods=["POST"])
 def chat():
     data = request.get_json()
     message = data.get("message", "")
 
-    response = client.chat.completions.create(
-    model="gpt-3.5-turbo",  # ✅ 여기!
-    messages=[{"role": "user", "content": message}]
-)
+    try:
+        response = model.generate_content(message)
+        reply = response.text.strip()
+    except Exception as e:
+        reply = f"에러 발생: {str(e)}"
 
-    return jsonify({"reply": response.choices[0].message.content.strip()})
+    return jsonify({"reply": reply})
 
 @app.route("/")
 def home():
-    return "AI 백엔드 작동 중!"
+    return "Gemini 백엔드 작동 중!"
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
